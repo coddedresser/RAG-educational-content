@@ -6,7 +6,7 @@ streamlit-option-menu
 chromadb
 sentence-transformers
 
-# LLM Integration - LATEST COMPATIBLE
+# LLM Integration
 langchain
 langchain-community
 openai
@@ -39,3 +39,7 @@ ragas
 
 # Deployment
 gunicorn
+
+# PYTHON 3.13 COMPATIBILITY FIXES
+pyarrow>=14.0.0
+datasets>=2.16.0
