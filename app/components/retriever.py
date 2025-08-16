@@ -29,14 +29,14 @@ class EducationalRetriever:
     def _initialize_database(self):
         """Initialize ChromaDB client and collection"""
         try:
-            # Create persistent client
-            self.client = chromadb.PersistentClient(
-                path=str(self.persist_directory),
-                settings=Settings(
-                    anonymized_telemetry=False,
-                    allow_reset=True
-                )
-            )
+            # Use in-memory client to avoid SQLite version issues
+            self.client = chromadb.Client(Settings(
+                chroma_db_impl="duckdb+parquet",
+                persist_directory=None,  # Use in-memory storage
+                is_persistent=False,
+                anonymized_telemetry=False,
+                allow_reset=True
+            ))
             
             # Get or create collection
             self.collection = self.client.get_or_create_collection(
@@ -49,8 +49,18 @@ class EducationalRetriever:
             
         except Exception as e:
             self.logger.error(f"Error initializing database: {e}")
-            raise
-    
+            # Fallback to in-memory only
+            try:
+                self.client = chromadb.Client()
+                self.collection = self.client.get_or_create_collection(
+                    name=self.collection_name,
+                    metadata={"description": "Educational content for RAG system"}
+                )
+                self.logger.info(f"Fallback to in-memory ChromaDB successful")
+            except Exception as fallback_error:
+                self.logger.error(f"Fallback also failed: {fallback_error}")
+                raise
+
     def add_chunks_to_database(self, chunks: List[ContentChunk], batch_size: int = 100):
         """Add content chunks to ChromaDB"""
         if not chunks:
