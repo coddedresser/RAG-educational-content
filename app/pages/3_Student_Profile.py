@@ -1,11 +1,14 @@
 """
-Student Profile Management Page - Using Real Project Data
+Student Profile Management Page - Using Real Project Data with AI Enhancement
 """
 import streamlit as st
 import pandas as pd
 import plotly.express as px
 from pathlib import Path
 import json
+
+# Import the free LLM service for AI-powered profile analysis
+from components.llm_service import FreeLLMService
 
 def get_real_student_data():
     """Get authentic student data based on actual project content"""
@@ -131,6 +134,62 @@ def student_profile_page():
             
             if submit_button:
                 st.success("✅ Profile updated successfully!")
+    
+    # AI-Powered Profile Analysis
+    st.subheader("🤖 AI-Powered Profile Analysis")
+    
+    # Initialize LLM service
+    llm_service = FreeLLMService()
+    
+    col_ai1, col_ai2 = st.columns(2)
+    
+    with col_ai1:
+        st.write("**AI Learning Style Assessment:**")
+        if st.button("🧠 Analyze Learning Style"):
+            with st.spinner("🤖 AI is analyzing your profile..."):
+                # Create student profile context for AI analysis
+                student_context = f"""
+                Student Profile:
+                - Age: {age}
+                - Education Level: {education_level}
+                - Learning Style: {learning_style}
+                - Preferred Subjects: {', '.join(preferred_subjects)}
+                - Study Time: {study_time}
+                """
+                
+                # Analyze learning style with AI
+                ai_learning_style = llm_service.classify_learning_style([student_context])
+                st.success("🧠 AI Learning Style Analysis:")
+                st.write(f"**Current Selection**: {learning_style.title()}")
+                st.write(f"**AI Recommendation**: {ai_learning_style.title()}")
+                
+                if ai_learning_style.lower() != learning_style.lower():
+                    st.info("💡 AI suggests trying a different learning style for better results!")
+                    st.write("**AI Reasoning**: The AI analyzed your profile and found patterns that suggest a different learning approach might be more effective.")
+                else:
+                    st.success("🎯 AI confirms your learning style choice is optimal!")
+    
+    with col_ai2:
+        st.write("**AI Study Recommendations:**")
+        if st.button("💡 Get AI Study Tips"):
+            with st.spinner("🤖 AI is generating personalized study tips..."):
+                # Create context for study recommendations
+                study_context = f"""
+                Student needs study recommendations for:
+                - Subjects: {', '.join(preferred_subjects)}
+                - Current Level: {', '.join([f'{s}: {l}' for s, l in skill_levels.items()])}
+                - Available Time: {study_time}
+                """
+                
+                # Get AI study recommendations
+                ai_recommendations = llm_service.answer_educational_question(
+                    "What are the best study strategies for this student profile?",
+                    study_context
+                )
+                st.success("💡 AI Study Recommendations:")
+                st.write(ai_recommendations)
+    
+    st.divider()
     
     with col2:
         st.subheader(" Profile Summary")

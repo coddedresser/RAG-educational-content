@@ -279,8 +279,48 @@ def main():
         else:
             st.info("No content available at the moment.")
     
+    # AI-Powered Features Showcase
+    st.subheader("🤖 AI-Powered Features Available Now!")
+    
+    col_ai1, col_ai2 = st.columns(2)
+    
+    with col_ai1:
+        st.success("**🎯 AI Learning Path Generation**")
+        st.write("""
+        • **🤖 AI-powered learning paths** using FREE Hugging Face models
+        • **🧠 Intelligent content sequencing** based on your profile
+        • **📝 AI-generated learning objectives** and success criteria
+        • **🎯 Personalized difficulty progression** recommendations
+        """)
+        
+        st.success("**🔍 AI-Enhanced Content Search**")
+        st.write("""
+        • **📝 AI content summarization** of search results
+        • **🚀 AI search query enhancement** for better results
+        • **🧠 Intelligent content recommendations** based on context
+        """)
+    
+    with col_ai2:
+        st.success("**👤 AI Student Profile Analysis**")
+        st.write("""
+        • **🧠 AI learning style assessment** and recommendations
+        • **💡 AI study strategy suggestions** based on your profile
+        • **🎯 Personalized learning optimization** tips
+        """)
+        
+        st.success("**📊 AI Progress & System Analysis**")
+        st.write("""
+        • **🧠 AI progress analysis** with actionable insights
+        • **🚀 AI study optimization** recommendations
+        • **🤖 AI system performance analysis** and improvement tips
+        """)
+    
+    st.info("💡 **All AI features use completely FREE Hugging Face models - no API keys required!**")
+    
+    st.divider()
+    
     # Coming soon features showcase
-    st.subheader("🚧 Advanced Features Coming Soon")
+    st.subheader("🚧 Additional Features Coming Soon")
     
     col_feature1, col_feature2 = st.columns(2)
     

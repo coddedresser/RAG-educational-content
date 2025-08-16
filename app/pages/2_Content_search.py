@@ -1,11 +1,14 @@
 """
-Content Search and Retrieval Page - Using Real Project Data
+Content Search and Retrieval Page - Using Real Project Data with AI Enhancement
 """
 import streamlit as st
 import pandas as pd
 import plotly.express as px
 from pathlib import Path
 import json
+
+# Import the free LLM service for AI-powered search
+from components.llm_service import FreeLLMService
 
 def get_real_search_results(query, subject_filter="All", difficulty_filter="All", content_type_filter="All"):
     """Get authentic search results from actual project content"""
@@ -133,6 +136,53 @@ def content_search_page():
         st.write("")
         st.write("")
         search_button = st.button("🔍 Search", type="primary")
+    
+    # AI-Powered Search Features
+    st.subheader("🤖 AI-Powered Search Enhancement")
+    
+    # Initialize LLM service
+    llm_service = FreeLLMService()
+    
+    col_ai1, col_ai2 = st.columns(2)
+    
+    with col_ai1:
+        st.write("**AI Content Summarization:**")
+        if st.button("📝 Get AI Summary of Results"):
+            if search_query:
+                with st.spinner("🤖 AI is analyzing search results..."):
+                    # Get search results for AI analysis
+                    results = get_real_search_results(search_query, subject_filter, difficulty_filter, content_type_filter)
+                    if results:
+                        # Combine content for AI summarization
+                        combined_content = " ".join([result['content'] for result in results[:5]])
+                        if combined_content:
+                            ai_summary = llm_service.generate_content_summary(combined_content)
+                            st.success("📝 AI Summary of Search Results:")
+                            st.write(ai_summary)
+                        else:
+                            st.warning("No content available for AI summary")
+                    else:
+                        st.warning("No search results to summarize")
+            else:
+                st.warning("Please enter a search query first")
+    
+    with col_ai2:
+        st.write("**AI Search Query Enhancement:**")
+        if st.button("🚀 Enhance Search Query"):
+            if search_query:
+                with st.spinner("🤖 AI is enhancing your query..."):
+                    # Create context for query enhancement
+                    context = f"User wants to search for: {search_query}"
+                    enhanced_query = llm_service.answer_educational_question(
+                        "How can I improve this search query to get better results?",
+                        context
+                    )
+                    st.success("🚀 AI-Enhanced Search Suggestions:")
+                    st.write(enhanced_query)
+            else:
+                st.warning("Please enter a search query first")
+    
+    st.divider()
     
     # Search results
     if search_button and search_query:
