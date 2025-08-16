@@ -7,6 +7,9 @@ import plotly.express as px
 from pathlib import Path
 import json
 
+# Import the free LLM service
+from components.llm_service import FreeLLMService
+
 def get_real_learning_paths():
     """Get authentic learning paths from actual project data"""
     try:
@@ -80,12 +83,15 @@ def get_real_student_progress():
         return []
 
 def learning_path_page():
-    st.title("🎯 Learning Path Generation")
-    st.write("Generate personalized learning paths based on your profile and goals using real project data.")
+    st.title("🎯 AI-Powered Learning Path Generation")
+    st.write("Generate personalized learning paths using FREE AI models and real project data.")
     
     # Get real data
     real_paths = get_real_learning_paths()
     real_progress = get_real_student_progress()
+    
+    # Initialize LLM service for AI-powered features
+    llm_service = FreeLLMService()
     
     # Sidebar for user input
     with st.sidebar:
@@ -106,43 +112,165 @@ def learning_path_page():
     with col1:
         st.subheader("�� Your Learning Path")
         
-        # Generate real learning path based on selection
-        if st.button("🔍 Generate Learning Path"):
-            # Filter content based on user selection
-            selected_content = [c for c in SAMPLE_CONTENT if c['subject'] == subject]
-            
-            if selected_content:
-                st.success("✅ Learning path generated successfully!")
+        # Generate AI-powered learning path
+        col1_1, col1_2 = st.columns([1, 1])
+        
+        with col1_1:
+            if st.button("🔍 Generate Standard Path"):
+                # Filter content based on user selection
+                selected_content = [c for c in SAMPLE_CONTENT if c['subject'] == subject]
                 
-                # Display real path
-                for i, content in enumerate(selected_content, 1):
-                    with st.expander(f"{i}. {content['title']} ({content.get('estimated_time', 0)}min)"):
-                        st.write(f"**Subject:** {content['subject']}")
-                        st.write(f"**Difficulty:** {content['difficulty_level']}")
-                        st.write(f"**Content Type:** {content['content_type']}")
+                if selected_content:
+                    st.success("✅ Standard learning path generated!")
+                    
+                    # Display standard path
+                    for i, content in enumerate(selected_content, 1):
+                        with st.expander(f"{i}. {content['title']} ({content.get('estimated_time', 0)}min)"):
+                            st.write(f"**Subject:** {content['subject']}")
+                            st.write(f"**Difficulty:** {content['difficulty_level']}")
+                            st.write(f"**Content Type:** {content['content_type']}")
+                            
+                            if content.get('learning_objectives'):
+                                st.write("**Learning Objectives:**")
+                                for obj in content['learning_objectives']:
+                                    st.write(f"• {obj}")
+                            
+                            if content.get('prerequisites'):
+                                st.write("**Prerequisites:**")
+                                for prereq in content['prerequisites']:
+                                    st.write(f"• {prereq}")
+                            
+                            # Progress tracking
+                            progress = st.progress(0)
+                            if st.button(f"Start {content['title']}", key=f"start_{i}"):
+                                st.info("🎬 Learning session started!")
+                    
+                    # Show path summary
+                    total_time = sum(c.get('estimated_time', 0) for c in selected_content)
+                    st.info(f"**Path Summary:** {len(selected_content)} items, {total_time} minutes total")
+                else:
+                    st.warning(f"No content available for {subject}")
+        
+        with col1_2:
+            if st.button("🤖 Generate AI Learning Path"):
+                with st.spinner("🤖 AI is generating your personalized learning path..."):
+                    # Generate AI-powered learning path
+                    student_profile = {
+                        'level': level,
+                        'style': learning_style,
+                        'time_available': time_available
+                    }
+                    
+                    # Filter content by subject
+                    available_content = [c for c in SAMPLE_CONTENT if c['subject'] == subject]
+                    
+                    ai_path = llm_service.generate_learning_path(
+                        user_query=f"Create a learning path for {subject}",
+                        student_profile=student_profile,
+                        available_content=available_content
+                    )
+                    
+                    if ai_path.get('ai_generated'):
+                        st.success("✅ AI-generated learning path created!")
                         
-                        if content.get('learning_objectives'):
+                        # Display AI-generated path
+                        st.subheader("🤖 AI-Generated Learning Path")
+                        st.write(f"**Title**: {ai_path['title']}")
+                        
+                        # Learning objectives
+                        if ai_path.get('objectives'):
                             st.write("**Learning Objectives:**")
-                            for obj in content['learning_objectives']:
+                            for obj in ai_path['objectives']:
                                 st.write(f"• {obj}")
                         
-                        if content.get('prerequisites'):
-                            st.write("**Prerequisites:**")
-                            for prereq in content['prerequisites']:
-                                st.write(f"• {prereq}")
+                        # Content sequence
+                        st.write("**Recommended Sequence:**")
+                        for i, content in enumerate(ai_path.get('content_sequence', []), 1):
+                            st.write(f"{i}. {content['title']} ({content['subject']})")
                         
-                        # Progress tracking
-                        progress = st.progress(0)
-                        if st.button(f"Start {content['title']}", key=f"start_{i}"):
-                            st.info("🎬 Learning session started!")
-                
-                # Show path summary
-                total_time = sum(c.get('estimated_time', 0) for c in selected_content)
-                st.info(f"**Path Summary:** {len(selected_content)} items, {total_time} minutes total")
-            else:
-                st.warning(f"No content available for {subject}")
+                        # Success criteria
+                        if ai_path.get('success_criteria'):
+                            st.write("**Success Criteria:**")
+                            for criteria in ai_path['success_criteria']:
+                                st.write(f"• {criteria}")
+                        
+                        st.info(f"**Total Estimated Time**: {ai_path.get('estimated_time', 0)} minutes")
+                        
+                        # Show AI confidence
+                        st.success("🎯 AI has analyzed your profile and created a personalized path!")
+                    else:
+                        st.warning("⚠️ AI service unavailable, using fallback path")
+                        # Show fallback path
+                        st.subheader("🛤️ Fallback Learning Path")
+                        selected_content = [c for c in SAMPLE_CONTENT if c['subject'] == subject]
+                        
+                        for i, content in enumerate(selected_content[:5], 1):
+                            st.write(f"{i}. {content['title']} ({content['subject']})")
+                        
+                        total_time = sum(c.get('estimated_time', 0) for c in selected_content[:5])
+                        st.info(f"**Fallback Summary:** 5 items, {total_time} minutes total")
     
     with col2:
+        st.subheader("🤖 AI-Powered Features")
+        
+        # AI Question Answering
+        st.write("**Ask AI about your learning topic:**")
+        ai_question = st.text_input("Ask a question about your subject:", 
+                                   placeholder="e.g., What are the fundamentals of this topic?",
+                                   key="ai_question")
+        
+        if ai_question and st.button("🤖 Ask AI"):
+            with st.spinner("🤖 AI is thinking..."):
+                # Get context from available content
+                context_content = [c for c in SAMPLE_CONTENT if c['subject'] == subject]
+                context = " ".join([c.get('description', '') for c in context_content[:3]])
+                
+                if context:
+                    ai_answer = llm_service.answer_educational_question(ai_question, context)
+                    st.success("🤖 AI Answer:")
+                    st.write(ai_answer)
+                else:
+                    st.warning("No content available for context")
+        
+        # AI Content Summarization
+        st.write("**Get AI summary of content:**")
+        if st.button("📝 Generate AI Summary"):
+            with st.spinner("🤖 AI is summarizing..."):
+                # Get content for the selected subject
+                subject_content = [c for c in SAMPLE_CONTENT if c['subject'] == subject]
+                if subject_content:
+                    # Combine descriptions for summarization
+                    combined_content = " ".join([c.get('description', '') for c in subject_content[:5]])
+                    if combined_content:
+                        ai_summary = llm_service.generate_content_summary(combined_content)
+                        st.success("📝 AI Summary:")
+                        st.write(ai_summary)
+                    else:
+                        st.warning("No content descriptions available")
+                else:
+                    st.warning("No content available for this subject")
+        
+        # AI Learning Style Analysis
+        st.write("**AI Learning Style Assessment:**")
+        if st.button("🧠 Analyze Learning Style"):
+            with st.spinner("🤖 AI is analyzing..."):
+                # Simulate student responses for learning style
+                student_responses = [
+                    f"I prefer {learning_style} learning",
+                    f"My current level is {level}",
+                    f"I have {time_available} minutes available"
+                ]
+                
+                ai_learning_style = llm_service.classify_learning_style(student_responses)
+                st.success("🧠 AI Learning Style Analysis:")
+                st.write(f"**Recommended Style**: {ai_learning_style.title()}")
+                st.write(f"**Current Selection**: {learning_style.title()}")
+                
+                if ai_learning_style.lower() != learning_style.lower():
+                    st.info("💡 AI suggests trying a different learning style for better results!")
+        
+        st.divider()
+        
         st.subheader("📊 Real Progress Overview")
         
         if real_progress:

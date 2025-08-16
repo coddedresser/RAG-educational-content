@@ -1,5 +1,5 @@
 """
-Progress Tracking and Analytics Page - Using Real Project Data
+Progress Tracking and Analytics Page - Using Real Project Data with AI Enhancement
 """
 import streamlit as st
 import pandas as pd
@@ -8,6 +8,9 @@ import plotly.graph_objects as go
 from pathlib import Path
 import json
 import numpy as np
+
+# Import the free LLM service for AI-powered progress analysis
+from components.llm_service import FreeLLMService
 
 def get_real_progress_data():
     """Get authentic progress data based on actual project content"""
@@ -136,6 +139,59 @@ def progress_tracking_page():
             st.metric("Avg Performance", f"{total_performance:.1f}%")
         with col4:
             st.metric("Total Sessions", total_sessions)
+    
+    # AI-Powered Progress Analysis
+    st.subheader("🤖 AI-Powered Progress Insights")
+    
+    # Initialize LLM service
+    llm_service = FreeLLMService()
+    
+    col_ai1, col_ai2 = st.columns(2)
+    
+    with col_ai1:
+        st.write("**AI Progress Analysis:**")
+        if st.button("🧠 Analyze My Progress"):
+            with st.spinner("🤖 AI is analyzing your progress..."):
+                # Create progress context for AI analysis
+                progress_context = f"""
+                Student Progress Summary:
+                - Total Study Time: {total_study_time} minutes
+                - Average Completion Rate: {total_completion:.1f}%
+                - Average Performance: {total_performance:.1f}%
+                - Total Study Sessions: {total_sessions}
+                - Subjects Studied: {len(subject_performance)}
+                """
+                
+                # Get AI progress analysis
+                ai_analysis = llm_service.answer_educational_question(
+                    "What insights can you provide about this student's learning progress and what recommendations do you have?",
+                    progress_context
+                )
+                st.success("🧠 AI Progress Analysis:")
+                st.write(ai_analysis)
+    
+    with col_ai2:
+        st.write("**AI Study Optimization:**")
+        if st.button("🚀 Get Study Tips"):
+            with st.spinner("🤖 AI is generating optimization tips..."):
+                # Create study optimization context
+                optimization_context = f"""
+                Student needs study optimization for:
+                - Current Performance: {total_performance:.1f}%
+                - Completion Rate: {total_completion:.1f}%
+                - Study Time: {total_study_time} minutes
+                - Weakest Subject: {min(subject_performance.items(), key=lambda x: x[1]['avg_performance'])[0] if subject_performance else 'N/A'}
+                """
+                
+                # Get AI optimization tips
+                ai_tips = llm_service.answer_educational_question(
+                    "How can this student improve their study efficiency and performance?",
+                    optimization_context
+                )
+                st.success("🚀 AI Study Optimization Tips:")
+                st.write(ai_tips)
+    
+    st.divider()
     
     # Real progress charts
     if weekly_progress is not None and not weekly_progress.empty:
