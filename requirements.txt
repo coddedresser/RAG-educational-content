@@ -3,7 +3,8 @@ streamlit
 streamlit-option-menu
 
 # RAG & Vector Database
-chromadb
+#chromadb
+faiss-cpu
 sentence-transformers
 
 # LLM Integration

@@ -3,247 +3,293 @@ Configuration settings for the Educational RAG System
 """
 import os
 from pathlib import Path
-from typing import Dict, List
+from typing import List, Dict, Any
 from pydantic_settings import BaseSettings
+
 class Config(BaseSettings):
-    """Application configuration"""
+    """Configuration class for the Educational RAG System"""
     
-    # Application Settings
-    APP_NAME: str = "Educational RAG System"
-    APP_VERSION: str = "1.0.0"
-    DEBUG: bool = False
+    # Base directory configuration
+    BASE_DIR: Path = Path(__file__).parent.parent
     
-    # API Keys (from environment variables)
+    # Data directories
+    DATA_DIR: Path = BASE_DIR / "data"
+    PROCESSED_DATA_DIR: Path = BASE_DIR / "processed_data"
+    VECTOR_DB_DIR: Path = BASE_DIR / "vector_db"
+    MODELS_DIR: Path = BASE_DIR / "models"
+    LOGS_DIR: Path = BASE_DIR / "logs"
+    
+    # File paths
+    LOG_FILE: Path = LOGS_DIR / "educational_rag.log"
+    CONFIG_FILE: Path = BASE_DIR / "config.json"
+    
+    # Database configuration
+    DATABASE_URL: str = "sqlite:///educational_rag.db"
+    
+    # Model configuration
+    EMBEDDING_MODEL: str = "sentence-transformers/all-MiniLM-L6-v2"
+    CHUNK_SIZE: int = 1000
+    CHUNK_OVERLAP: int = 200
+    
+    # Search configuration
+    DEFAULT_TOP_K: int = 5
+    MAX_TOP_K: int = 50
+    SIMILARITY_THRESHOLD: float = 0.7
+    
+    # Learning path configuration
+    MAX_PATH_LENGTH: int = 10
+    MIN_PATH_LENGTH: int = 3
+    DEFAULT_ESTIMATED_TIME: int = 30
+    
+    # Student profile configuration
+    DEFAULT_LEARNING_STYLE: str = "visual"
+    DEFAULT_LEVEL: str = "beginner"
+    SUPPORTED_SUBJECTS: List[str] = [
+        "Mathematics", "Programming", "Science", "Literature", 
+        "History", "Geography", "Art", "Music", "Physical Education"
+    ]
+    
+    # Content types
+    CONTENT_TYPES: List[str] = [
+        "lesson", "exercise", "quiz", "video", "reading", 
+        "project", "assessment", "tutorial"
+    ]
+    
+    # Difficulty levels
+    DIFFICULTY_LEVELS: List[str] = ["beginner", "intermediate", "advanced"]
+    
+    # API configuration
     OPENAI_API_KEY: str = ""
     HUGGINGFACE_API_KEY: str = ""
     
-    # Paths
-    BASE_DIR: Path = Path(__file__).parent.parent
-    DATA_DIR: Path = BASE_DIR / "data"
-    RAW_DATA_DIR: Path = DATA_DIR / "raw"
-    PROCESSED_DATA_DIR: Path = DATA_DIR / "processed"
-    VECTOR_DB_DIR: Path = BASE_DIR / "vector_db"
-    MODELS_DIR: Path = BASE_DIR / "models"
+    # Logging configuration
+    LOG_LEVEL: str = "INFO"
+    LOG_FORMAT: str = "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
     
-    # Vector Database Settings
-    CHROMA_COLLECTION_NAME: str = "educational_content"
-    EMBEDDING_MODEL_NAME: str = "sentence-transformers/all-MiniLM-L6-v2"
-    VECTOR_DB_PERSIST: bool = True
+    # Performance configuration
+    BATCH_SIZE: int = 100
+    MAX_WORKERS: int = 4
+    CACHE_TTL: int = 3600  # 1 hour
     
-    # Chunking Settings
-    CHUNK_SIZE: int = 512
-    CHUNK_OVERLAP: int = 102  # 20% overlap
-    MIN_CHUNK_SIZE: int = 100
-    MAX_CHUNK_SIZE: int = 1000
-    
-    # Retrieval Settings
-    DEFAULT_TOP_K: int = 5
-    MAX_TOP_K: int = 20
-    SIMILARITY_THRESHOLD: float = 0.7
-    
-    # Learning Path Settings
-    MAX_PATH_LENGTH: int = 50
-    MIN_PATH_LENGTH: int = 3
-    DEFAULT_DIFFICULTY_PROGRESSION: float = 0.1  # 10% increase per step
-    
-    # Student Profile Settings
-    LEARNING_STYLES: List[str] = ["visual", "auditory", "kinesthetic", "reading"]
-    DIFFICULTY_LEVELS: List[str] = ["beginner", "intermediate", "advanced"]
-    LEARNING_PACES: List[str] = ["slow", "medium", "fast"]
-    
-    # Content Categories
-    SUBJECTS: List[str] = [
-        "Mathematics", "Science", "History", "Literature", "Programming",
-        "Physics", "Chemistry", "Biology", "Geography", "Art"
-    ]
-    
-    CONTENT_TYPES: List[str] = [
-        "lesson", "exercise", "quiz", "video", "reading", "project"
-    ]
-    
-    # Progress Tracking
-    PROGRESS_DB_NAME: str = "student_progress.db"
-    MASTERY_THRESHOLD: float = 0.8  # 80% to consider mastered
-    
-    # UI Settings
-    PAGE_TITLE: str = "🎓 Educational Learning Assistant"
-    SIDEBAR_TITLE: str = "Navigation"
-    
-    # Assessment Settings
-    ASSESSMENT_QUESTIONS_PER_TOPIC: int = 5
-    PASSING_SCORE: float = 0.7
-    
-    # Time Estimates (in minutes)
-    CONTENT_TIME_ESTIMATES: Dict[str, int] = {
-        "lesson": 15,
-        "exercise": 10,
-        "quiz": 5,
-        "video": 20,
-        "reading": 12,
-        "project": 60
-    }
+    # UI configuration
+    PAGE_TITLE: str = "Educational RAG System"
+    PAGE_ICON: str = "��"
+    LAYOUT: str = "wide"
     
     class Config:
         env_file = ".env"
-        case_sensitive = True
+        case_sensitive = False
 
-# Global configuration instance
+# Create global config instance
 config = Config()
 
-# Create necessary directories
 def create_directories():
     """Create necessary directories if they don't exist"""
     directories = [
         config.DATA_DIR,
-        config.RAW_DATA_DIR,
         config.PROCESSED_DATA_DIR,
         config.VECTOR_DB_DIR,
         config.MODELS_DIR,
+        config.LOGS_DIR
     ]
     
     for directory in directories:
         directory.mkdir(parents=True, exist_ok=True)
-
-# Learning objectives mapping for different subjects
-LEARNING_OBJECTIVES_MAP = {
-    "Mathematics": {
-        "beginner": [
-            "Basic arithmetic operations",
-            "Number patterns and sequences",
-            "Simple geometry shapes",
-            "Basic fractions and decimals"
-        ],
-        "intermediate": [
-            "Algebraic expressions and equations",
-            "Coordinate geometry",
-            "Probability and statistics basics",
-            "Advanced fractions and percentages"
-        ],
-        "advanced": [
-            "Calculus fundamentals",
-            "Advanced statistics",
-            "Complex number systems",
-            "Advanced geometry and trigonometry"
-        ]
-    },
-    "Science": {
-        "beginner": [
-            "Scientific method basics",
-            "States of matter",
-            "Simple machines",
-            "Weather and climate"
-        ],
-        "intermediate": [
-            "Chemical reactions",
-            "Energy and motion",
-            "Cell biology",
-            "Earth's systems"
-        ],
-        "advanced": [
-            "Molecular biology",
-            "Thermodynamics",
-            "Quantum physics basics",
-            "Environmental science"
-        ]
-    },
-    "Programming": {
-        "beginner": [
-            "Programming fundamentals",
-            "Variables and data types",
-            "Control structures",
-            "Basic input/output"
-        ],
-        "intermediate": [
-            "Object-oriented programming",
-            "Data structures",
-            "Algorithm design",
-            "Database basics"
-        ],
-        "advanced": [
-            "Advanced algorithms",
-            "System design",
-            "Machine learning basics",
-            "Software architecture"
-        ]
-    }
-}
-
-# Prerequisites mapping
-PREREQUISITES_MAP = {
-    "Advanced algebra": ["Basic algebra", "Arithmetic operations"],
-    "Calculus": ["Advanced algebra", "Functions and graphs"],
-    "Object-oriented programming": ["Programming fundamentals", "Control structures"],
-    "Machine learning": ["Programming fundamentals", "Statistics", "Linear algebra"],
-    "Chemical reactions": ["Atomic structure", "Elements and compounds"],
-    "Cell biology": ["Basic biology", "Scientific method"],
-}
+        print(f"✅ Created directory: {directory}")
 
 # Sample educational content for demonstration
 SAMPLE_CONTENT = [
     {
-        "content_id": "math_001",
         "title": "Introduction to Algebra",
         "subject": "Mathematics",
-        "topic": "Basic Algebra",
+        "topic": "Algebra Basics",
         "difficulty_level": "beginner",
-        "learning_objectives": ["Understanding variables", "Basic algebraic expressions"],
-        "prerequisites": ["Basic arithmetic"],
         "content_type": "lesson",
         "estimated_time": 15,
-        "tags": ["algebra", "variables", "expressions"],
+        "learning_objectives": [
+            "Understanding variables",
+            "Basic algebraic expressions",
+            "Simple equations"
+        ],
+        "prerequisites": [],
+        "tags": ["algebra", "variables", "equations", "beginner"],
         "content": """
-        Algebra is a branch of mathematics that uses letters and symbols to represent numbers and quantities in formulas and equations. 
+        Algebra is a branch of mathematics that deals with symbols and the rules for manipulating these symbols.
+        In algebra, we use letters (variables) to represent unknown values and solve equations.
         
-        A variable is a letter or symbol that represents an unknown value. For example, in the equation x + 3 = 7, 'x' is a variable.
+        Key Concepts:
+        1. Variables: Letters that represent unknown values (e.g., x, y, z)
+        2. Constants: Fixed numbers (e.g., 5, -3, 0.5)
+        3. Expressions: Combinations of variables and constants (e.g., 2x + 3)
+        4. Equations: Mathematical statements with equals sign (e.g., 2x + 3 = 7)
         
-        An algebraic expression is a combination of variables, numbers, and operations. Examples include:
-        - 2x + 5 (linear expression)
-        - x² + 3x - 2 (quadratic expression)
+        Example:
+        Solve for x: 2x + 3 = 7
         
-        Key concepts:
-        1. Variables can represent any number
-        2. We can perform operations on variables just like numbers
-        3. The goal is often to find the value of the variable
-        """,
-        "metadata": {"author": "Dr. Smith", "last_updated": "2024-01-15"}
+        Solution:
+        Step 1: Subtract 3 from both sides
+        2x + 3 - 3 = 7 - 3
+        2x = 4
+        
+        Step 2: Divide both sides by 2
+        2x ÷ 2 = 4 ÷ 2
+        x = 2
+        
+        Therefore, x = 2
+        """
     },
     {
-        "content_id": "prog_001",
         "title": "Variables in Python",
         "subject": "Programming",
         "topic": "Python Basics",
         "difficulty_level": "beginner",
-        "learning_objectives": ["Understanding variables", "Variable assignment", "Data types"],
-        "prerequisites": ["Basic computer literacy"],
         "content_type": "lesson",
         "estimated_time": 20,
-        "tags": ["python", "variables", "programming"],
+        "learning_objectives": [
+            "Understanding variables",
+            "Data types",
+            "Basic programming concepts"
+        ],
+        "prerequisites": [],
+        "tags": ["python", "variables", "programming", "beginner"],
         "content": """
-        Variables in Python are containers that store data values. Unlike other programming languages, Python has no command for declaring a variable.
+        Variables are fundamental building blocks in programming. They allow us to store and manipulate data.
         
-        Creating Variables:
-        ```python
-        x = 5
-        y = "Hello"
-        z = 3.14
-        ```
+        What is a Variable?
+        A variable is a named container that stores a value. Think of it as a labeled box where you can put different types of data.
         
-        Variable Names:
-        - Must start with a letter or underscore
+        Creating Variables in Python:
+        In Python, you create a variable by assigning a value to a name using the equals sign (=).
+        
+        Examples:
+        
+        1. String Variables:
+        name = "Alice"
+        message = "Hello, World!"
+        
+        2. Numeric Variables:
+        age = 25
+        height = 5.8
+        temperature = -5
+        
+        3. Boolean Variables:
+        is_student = True
+        is_working = False
+        
+        4. List Variables:
+        numbers = [1, 2, 3, 4, 5]
+        colors = ["red", "green", "blue"]
+        
+        Variable Naming Rules:
+        - Use descriptive names (e.g., 'user_age' instead of 'a')
+        - Start with a letter or underscore
         - Can contain letters, numbers, and underscores
-        - Case-sensitive (age and Age are different)
+        - Case sensitive (age ≠ Age)
+        - Avoid Python keywords (if, for, while, etc.)
         
-        Data Types:
-        - int: Integer numbers (5, -3, 100)
-        - float: Decimal numbers (3.14, -2.5)
-        - str: Text strings ("Hello", 'World')
-        - bool: True/False values
+        Good Examples:
+        - user_name
+        - total_score
+        - is_active
+        - first_name
         
-        You can check the type of a variable using type():
-        ```python
-        print(type(x))  # <class 'int'>
-        ```
-        """,
-        "metadata": {"author": "Prof. Johnson", "last_updated": "2024-01-20"}
+        Bad Examples:
+        - 1name (starts with number)
+        - user-name (contains hyphen)
+        - if (Python keyword)
+        
+        Using Variables:
+        Once you've created a variable, you can use it in expressions and operations.
+        
+        Example:
+        x = 5
+        y = 3
+        sum = x + y
+        print(sum)  # Output: 8
+        
+        Reassigning Variables:
+        Variables can be changed by assigning new values to them.
+        
+        Example:
+        age = 25
+        print(age)  # Output: 25
+        
+        age = 26
+        print(age)  # Output: 26
+        
+        Practice Exercise:
+        Create variables for:
+        1. Your name
+        2. Your age
+        3. Your favorite number
+        4. Whether you're a student (True/False)
+        
+        Then print all the information in a sentence.
+        """
     }
 ]
+
+# Additional configuration functions
+def get_content_by_subject(subject: str) -> List[Dict[str, Any]]:
+    """Get content filtered by subject"""
+    return [content for content in SAMPLE_CONTENT if content["subject"] == subject]
+
+def get_content_by_difficulty(difficulty: str) -> List[Dict[str, Any]]:
+    """Get content filtered by difficulty level"""
+    return [content for content in SAMPLE_CONTENT if content["difficulty_level"] == difficulty]
+
+def get_content_by_type(content_type: str) -> List[Dict[str, Any]]:
+    """Get content filtered by content type"""
+    return [content for content in SAMPLE_CONTENT if content["content_type"] == content_type]
+
+def get_available_subjects() -> List[str]:
+    """Get list of available subjects"""
+    return list(set(content["subject"] for content in SAMPLE_CONTENT))
+
+def get_available_topics(subject: str = None) -> List[str]:
+    """Get list of available topics, optionally filtered by subject"""
+    if subject:
+        return list(set(content["topic"] for content in SAMPLE_CONTENT if content["subject"] == subject))
+    return list(set(content["topic"] for content in SAMPLE_CONTENT))
+
+# Configuration validation
+def validate_config():
+    """Validate configuration settings"""
+    errors = []
+    
+    # Check required directories
+    required_dirs = [
+        config.DATA_DIR,
+        config.PROCESSED_DATA_DIR,
+        config.VECTOR_DB_DIR,
+        config.MODELS_DIR,
+        config.LOGS_DIR
+    ]
+    
+    for directory in required_dirs:
+        if not directory.exists():
+            errors.append(f"Directory does not exist: {directory}")
+    
+    # Check content validity
+    for i, content in enumerate(SAMPLE_CONTENT):
+        required_fields = ["title", "subject", "topic", "difficulty_level", "content_type"]
+        for field in required_fields:
+            if field not in content:
+                errors.append(f"Content {i}: Missing required field '{field}'")
+    
+    if errors:
+        raise ValueError(f"Configuration validation failed:\n" + "\n".join(errors))
+    
+    return True
+
+# Initialize configuration
+if __name__ == "__main__":
+    try:
+        create_directories()
+        validate_config()
+        print("✅ Configuration loaded successfully!")
+        print(f"📁 Base directory: {config.BASE_DIR}")
+        print(f"📚 Sample content: {len(SAMPLE_CONTENT)} items")
+        print(f"�� Available subjects: {', '.join(get_available_subjects())}")
+    except Exception as e:
+        print(f"❌ Configuration error: {e}")
