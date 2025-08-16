@@ -1,65 +1,76 @@
 """
-Vector-based retrieval system using ChromaDB for educational content
+Vector-based retrieval system using FAISS for educational content
 """
-import chromadb
-from chromadb.config import Settings
+import faiss
 import numpy as np
 from typing import List, Dict, Any, Optional, Tuple
 import logging
 from pathlib import Path
 import json
+import pickle
 from dataclasses import asdict
 
 from .data_processor import ContentChunk
 from .embeddings import EmbeddingGenerator, QueryProcessor
 
 class EducationalRetriever:
-    """Advanced retrieval system for educational content"""
+    """Advanced retrieval system for educational content using FAISS"""
     
     def __init__(self, persist_directory: Path, collection_name: str = "educational_content"):
         self.persist_directory = persist_directory
         self.collection_name = collection_name
-        self.client = None
-        self.collection = None
+        self.index = None
+        self.chunks = []
+        self.embeddings = []
         self.embedding_generator = EmbeddingGenerator()
         self.query_processor = QueryProcessor(self.embedding_generator)
         self.logger = logging.getLogger(__name__)
+        # Add collection attribute for compatibility
+        self.collection = self
         self._initialize_database()
     
     def _initialize_database(self):
-        """Initialize ChromaDB client and collection"""
+        """Initialize FAISS index"""
         try:
-            # Use in-memory client to avoid SQLite version issues
-            self.client = chromadb.Client(Settings(
-                chroma_db_impl="duckdb+parquet",
-                persist_directory=None,  # Use in-memory storage
-                is_persistent=False,
-                anonymized_telemetry=False,
-                allow_reset=True
-            ))
+            # Try to load existing index
+            index_path = self.persist_directory / f"{self.collection_name}_index.faiss"
+            chunks_path = self.persist_directory / f"{self.collection_name}_chunks.pkl"
             
-            # Get or create collection
-            self.collection = self.client.get_or_create_collection(
-                name=self.collection_name,
-                metadata={"description": "Educational content for RAG system"}
-            )
-            
-            self.logger.info(f"Initialized ChromaDB collection: {self.collection_name}")
-            self.logger.info(f"Collection contains {self.collection.count()} documents")
-            
+            if index_path.exists() and chunks_path.exists():
+                self.index = faiss.read_index(str(index_path))
+                with open(chunks_path, 'rb') as f:
+                    self.chunks = pickle.load(f)
+                self.embeddings = self.index.reconstruct_n(0, self.index.ntotal)
+                self.logger.info(f"Loaded existing FAISS index with {len(self.chunks)} chunks")
+            else:
+                # Create new index
+                self.index = faiss.IndexFlatIP(384)  # 384 for all-MiniLM-L6-v2
+                self.logger.info(f"Created new FAISS index: {self.collection_name}")
+                
         except Exception as e:
-            self.logger.error(f"Error initializing database: {e}")
-            # Fallback to in-memory only
-            try:
-                self.client = chromadb.Client()
-                self.collection = self.client.get_or_create_collection(
-                    name=self.collection_name,
-                    metadata={"description": "Educational content for RAG system"}
-                )
-                self.logger.info(f"Fallback to in-memory ChromaDB successful")
-            except Exception as fallback_error:
-                self.logger.error(f"Fallback also failed: {fallback_error}")
-                raise
+            self.logger.error(f"Error initializing FAISS database: {e}")
+            # Create basic index as fallback
+            self.index = faiss.IndexFlatIP(384)
+            self.logger.info("Created fallback FAISS index")
+    
+    # Add count method for compatibility
+    def count(self):
+        """Return number of chunks in the collection"""
+        return len(self.chunks)
+    
+    # Add get method for compatibility
+    def get(self, where=None, include=None):
+        """Get chunks with optional filtering (simplified for FAISS)"""
+        if where and 'content_id' in where:
+            content_id = where['content_id']
+            chunk = next((c for c in self.chunks if c.chunk_id == content_id), None)
+            if chunk:
+                return {
+                    'documents': [chunk.chunk_text],
+                    'metadatas': [chunk.__dict__],
+                    'embeddings': [self.embeddings[self.chunks.index(chunk)]]
+                }
+        return {'documents': [], 'metadatas': [], 'embeddings': []}
 
     def add_chunks_to_database(self, chunks: List[ContentChunk], batch_size: int = 100):
         """Add content chunks to ChromaDB"""
