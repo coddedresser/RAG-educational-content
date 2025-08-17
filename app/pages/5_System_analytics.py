@@ -1,5 +1,5 @@
 """
-System Analytics and Performance Page - Using Real Project Data
+System Analytics and Performance Page - Using Real Project Data with AI Enhancement
 """
 import streamlit as st
 import pandas as pd
@@ -9,6 +9,9 @@ from pathlib import Path
 import json
 import numpy as np
 import os
+
+# Import the free LLM service for AI-powered system analysis
+from components.llm_service import FreeLLMService
 
 def get_real_system_data():
     """Get authentic system data from actual project files"""
@@ -115,8 +118,28 @@ def get_real_file_structure():
         return {}
 
 def system_analytics_page():
-    st.title(" System Analytics & Performance")
-    st.write("Real-time system metrics and authentic project data analysis.")
+    # Check authentication
+    if 'session_token' not in st.session_state:
+        st.error("🔐 Please sign in to access this page")
+        st.stop()
+    
+    # Import auth component
+    try:
+        from components.auth import UserAuth
+    except ImportError:
+        from app.components.auth import UserAuth
+    
+    # Verify session
+    auth = UserAuth()
+    user = auth.get_user_from_session(st.session_state.session_token)
+    
+    if not user:
+        del st.session_state.session_token
+        st.error("🔐 Session expired. Please sign in again")
+        st.stop()
+    
+    st.title("📊 System Analytics & Performance")
+    st.write(f"Welcome, {user.get('full_name', user['username'])}! Real-time system metrics and authentic project data analysis.")
     
     # Get real data
     system_data = get_real_system_data()
@@ -134,6 +157,61 @@ def system_analytics_page():
         st.metric("Project Size", f"{system_data.get('total_size_kb', 0):.1f} KB")
     with col4:
         st.metric("Components", system_data.get('component_files', 0))
+    
+    # AI-Powered System Analysis
+    st.subheader("🤖 AI-Powered System Insights")
+    
+    # Initialize LLM service
+    llm_service = FreeLLMService()
+    
+    col_ai1, col_ai2 = st.columns(2)
+    
+    with col_ai1:
+        st.write("**AI System Analysis:**")
+        if st.button("🧠 Analyze System Performance"):
+            with st.spinner("🤖 AI is analyzing your system..."):
+                # Create system context for AI analysis
+                system_context = f"""
+                Educational RAG System Analysis:
+                - Python Files: {system_data.get('python_files', 0)}
+                - Total Lines of Code: {system_data.get('total_lines', 0):,}
+                - Project Size: {system_data.get('total_size_kb', 0):.1f} KB
+                - Components: {system_data.get('component_files', 0)}
+                - Content Items: {content_stats.get('total_content', 0)}
+                - Subjects Supported: {content_stats.get('supported_subjects', 0)}
+                """
+                
+                # Get AI system analysis
+                ai_analysis = llm_service.answer_educational_question(
+                    "What insights can you provide about this educational system's architecture and what recommendations do you have for improvement?",
+                    system_context
+                )
+                st.success("🧠 AI System Analysis:")
+                st.write(ai_analysis)
+    
+    with col_ai2:
+        st.write("**AI Content Optimization:**")
+        if st.button("🚀 Get Content Tips"):
+            with st.spinner("🤖 AI is analyzing content..."):
+                # Create content context for AI analysis
+                content_context = f"""
+                Content Analysis:
+                - Total Content: {content_stats.get('total_content', 0)} items
+                - Subjects: {', '.join(content_stats.get('subjects', {}).keys())}
+                - Difficulty Levels: {', '.join(content_stats.get('difficulties', {}).keys())}
+                - Content Types: {', '.join(content_stats.get('content_types', {}).keys())}
+                - Total Estimated Time: {content_stats.get('total_estimated_time', 0)} minutes
+                """
+                
+                # Get AI content optimization tips
+                ai_tips = llm_service.answer_educational_question(
+                    "How can this educational content be optimized for better learning outcomes?",
+                    content_context
+                )
+                st.success("🚀 AI Content Optimization Tips:")
+                st.write(ai_tips)
+    
+    st.divider()
     
     # Real content analytics
     st.subheader("📚 Authentic Content Analytics")

@@ -61,6 +61,7 @@ class Config(BaseSettings):
     # API configuration
     OPENAI_API_KEY: str = ""
     HUGGINGFACE_API_KEY: str = ""
+    GROQ_API_KEY: str = ""
     
     # Logging configuration
     LOG_LEVEL: str = "INFO"
@@ -293,3 +294,16 @@ if __name__ == "__main__":
         print(f"�� Available subjects: {', '.join(get_available_subjects())}")
     except Exception as e:
         print(f"❌ Configuration error: {e}")
+
+# Ensure data directory exists for authentication
+import os
+from pathlib import Path
+
+def ensure_data_directory():
+    """Ensure the data directory exists for storing user data"""
+    data_dir = Path("data")
+    data_dir.mkdir(exist_ok=True)
+    return data_dir
+
+# Initialize data directory
+ensure_data_directory()

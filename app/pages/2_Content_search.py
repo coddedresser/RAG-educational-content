@@ -96,8 +96,28 @@ def get_real_search_analytics():
         return {}
 
 def content_search_page():
+    # Check authentication
+    if 'session_token' not in st.session_state:
+        st.error("🔐 Please sign in to access this page")
+        st.stop()
+    
+    # Import auth component
+    try:
+        from components.auth import UserAuth
+    except ImportError:
+        from app.components.auth import UserAuth
+    
+    # Verify session
+    auth = UserAuth()
+    user = auth.get_user_from_session(st.session_state.session_token)
+    
+    if not user:
+        del st.session_state.session_token
+        st.error("🔐 Session expired. Please sign in again")
+        st.stop()
+    
     st.title("🔍 Content Search & Retrieval")
-    st.write("Search through authentic educational content using natural language queries.")
+    st.write(f"Welcome, {user.get('full_name', user['username'])}! Search through authentic educational content using natural language queries.")
     
     # Get real analytics
     analytics = get_real_search_analytics()

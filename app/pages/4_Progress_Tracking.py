@@ -114,8 +114,28 @@ def get_real_subject_performance():
         return {}
 
 def progress_tracking_page():
+    # Check authentication
+    if 'session_token' not in st.session_state:
+        st.error("🔐 Please sign in to access this page")
+        st.stop()
+    
+    # Import auth component
+    try:
+        from components.auth import UserAuth
+    except ImportError:
+        from app.components.auth import UserAuth
+    
+    # Verify session
+    auth = UserAuth()
+    user = auth.get_user_from_session(st.session_state.session_token)
+    
+    if not user:
+        del st.session_state.session_token
+        st.error("🔐 Session expired. Please sign in again")
+        st.stop()
+    
     st.title("📊 Progress Tracking & Analytics")
-    st.write("Monitor your learning progress and get insights into your study patterns using real project data.")
+    st.write(f"Welcome, {user.get('full_name', user['username'])}! Monitor your learning progress and get insights into your study patterns using real project data.")
     
     # Get real data
     progress_data = get_real_progress_data()

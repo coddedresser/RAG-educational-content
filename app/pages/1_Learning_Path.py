@@ -83,8 +83,28 @@ def get_real_student_progress():
         return []
 
 def learning_path_page():
+    # Check authentication
+    if 'session_token' not in st.session_state:
+        st.error("🔐 Please sign in to access this page")
+        st.stop()
+    
+    # Import auth component
+    try:
+        from components.auth import UserAuth
+    except ImportError:
+        from app.components.auth import UserAuth
+    
+    # Verify session
+    auth = UserAuth()
+    user = auth.get_user_from_session(st.session_state.session_token)
+    
+    if not user:
+        del st.session_state.session_token
+        st.error("🔐 Session expired. Please sign in again")
+        st.stop()
+    
     st.title("🎯 AI-Powered Learning Path Generation")
-    st.write("Generate personalized learning paths using FREE AI models and real project data.")
+    st.write(f"Welcome, {user.get('full_name', user['username'])}! Generate personalized learning paths using FREE AI models and real project data.")
     
     # Get real data
     real_paths = get_real_learning_paths()
