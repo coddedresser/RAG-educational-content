@@ -120,7 +120,7 @@ def get_real_file_structure():
 def system_analytics_page():
     # Check authentication
     if 'session_token' not in st.session_state:
-        st.error("🔐 Please sign in to access this page")
+        st.error("Please sign in to access this page")
         st.stop()
     
     # Import auth component
@@ -135,10 +135,10 @@ def system_analytics_page():
     
     if not user:
         del st.session_state.session_token
-        st.error("🔐 Session expired. Please sign in again")
+        st.error("Session expired. Please sign in again")
         st.stop()
     
-    st.title("📊 System Analytics & Performance")
+    st.title("System Analytics & Performance")
     st.write(f"Welcome, {user.get('full_name', user['username'])}! Real-time system metrics and authentic project data analysis.")
     
     # Get real data
@@ -159,7 +159,7 @@ def system_analytics_page():
         st.metric("Components", system_data.get('component_files', 0))
     
     # AI-Powered System Analysis
-    st.subheader("🤖 AI-Powered System Insights")
+    st.subheader("AI-Powered System Insights")
     
     # Initialize LLM service
     llm_service = FreeLLMService()
@@ -168,8 +168,8 @@ def system_analytics_page():
     
     with col_ai1:
         st.write("**AI System Analysis:**")
-        if st.button("🧠 Analyze System Performance"):
-            with st.spinner("🤖 AI is analyzing your system..."):
+        if st.button("Analyze System Performance"):
+            with st.spinner("AI is analyzing your system..."):
                 # Create system context for AI analysis
                 system_context = f"""
                 Educational RAG System Analysis:
@@ -186,13 +186,13 @@ def system_analytics_page():
                     "What insights can you provide about this educational system's architecture and what recommendations do you have for improvement?",
                     system_context
                 )
-                st.success("🧠 AI System Analysis:")
+                st.success("AI System Analysis:")
                 st.write(ai_analysis)
     
     with col_ai2:
         st.write("**AI Content Optimization:**")
-        if st.button("🚀 Get Content Tips"):
-            with st.spinner("🤖 AI is analyzing content..."):
+        if st.button("Get Content Tips"):
+            with st.spinner("AI is analyzing content..."):
                 # Create content context for AI analysis
                 content_context = f"""
                 Content Analysis:
@@ -208,13 +208,13 @@ def system_analytics_page():
                     "How can this educational content be optimized for better learning outcomes?",
                     content_context
                 )
-                st.success("🚀 AI Content Optimization Tips:")
+                st.success("AI Content Optimization Tips:")
                 st.write(ai_tips)
     
     st.divider()
     
     # Real content analytics
-    st.subheader("📚 Authentic Content Analytics")
+    st.subheader("Authentic Content Analytics")
     
     if content_stats:
         col_content1, col_content2 = st.columns(2)
@@ -246,7 +246,7 @@ def system_analytics_page():
                 st.plotly_chart(fig, use_container_width=True)
     
     # Real project structure
-    st.subheader("📁 Project File Structure")
+    st.subheader("Project File Structure")
     
     if file_structure:
         # Show file types and counts
@@ -273,7 +273,7 @@ def system_analytics_page():
                 st.write(f"• **{file_type}**: {count} files")
     
     # Real system performance
-    st.subheader("⚡ System Performance Metrics")
+    st.subheader("System Performance Metrics")
     
     col_perf1, col_perf2 = st.columns(2)
     
@@ -293,7 +293,7 @@ def system_analytics_page():
             st.metric("Supported Subjects", content_stats.get('supported_subjects', 0))
     
     # Real project insights
-    st.subheader("💡 Authentic Project Insights")
+    st.subheader("Authentic Project Insights")
     
     col_insight1, col_insight2 = st.columns(2)
     
@@ -314,7 +314,7 @@ def system_analytics_page():
             st.write(f"• **Content Types**: {content_stats.get('content_types_available', 0)} different formats")
     
     # Real file details
-    st.subheader("📋 Detailed File Analysis")
+    st.subheader("Detailed File Analysis")
     
     if file_structure:
         # Show actual files
@@ -326,7 +326,7 @@ def system_analytics_page():
                     st.write(f"• `{file_path}`")
     
     # System recommendations based on real data
-    st.subheader("💡 Data-Driven Recommendations")
+    st.subheader("Data-Driven Recommendations")
     
     if content_stats and system_data:
         col_rec1, col_rec2 = st.columns(2)

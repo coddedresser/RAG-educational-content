@@ -98,7 +98,7 @@ def get_real_search_analytics():
 def content_search_page():
     # Check authentication
     if 'session_token' not in st.session_state:
-        st.error("🔐 Please sign in to access this page")
+        st.error("Please sign in to access this page")
         st.stop()
     
     # Import auth component
@@ -113,10 +113,10 @@ def content_search_page():
     
     if not user:
         del st.session_state.session_token
-        st.error("🔐 Session expired. Please sign in again")
+        st.error("Session expired. Please sign in again")
         st.stop()
     
-    st.title("🔍 Content Search & Retrieval")
+    st.title("Content Search & Retrieval")
     st.write(f"Welcome, {user.get('full_name', user['username'])}! Search through authentic educational content using natural language queries.")
     
     # Get real analytics
@@ -155,10 +155,10 @@ def content_search_page():
     with col2:
         st.write("")
         st.write("")
-        search_button = st.button("🔍 Search", type="primary")
+        search_button = st.button("Search", type="primary")
     
     # AI-Powered Search Features
-    st.subheader("🤖 AI-Powered Search Enhancement")
+    st.subheader("AI-Powered Search Enhancement")
     
     # Initialize LLM service
     llm_service = FreeLLMService()
@@ -167,9 +167,9 @@ def content_search_page():
     
     with col_ai1:
         st.write("**AI Content Summarization:**")
-        if st.button("📝 Get AI Summary of Results"):
+        if st.button("Get AI Summary of Results"):
             if search_query:
-                with st.spinner("🤖 AI is analyzing search results..."):
+                with st.spinner("AI is analyzing search results..."):
                     # Get search results for AI analysis
                     results = get_real_search_results(search_query, subject_filter, difficulty_filter, content_type_filter)
                     if results:
@@ -177,7 +177,7 @@ def content_search_page():
                         combined_content = " ".join([result['content'] for result in results[:5]])
                         if combined_content:
                             ai_summary = llm_service.generate_content_summary(combined_content)
-                            st.success("📝 AI Summary of Search Results:")
+                            st.success("AI Summary of Search Results:")
                             st.write(ai_summary)
                         else:
                             st.warning("No content available for AI summary")
@@ -188,16 +188,16 @@ def content_search_page():
     
     with col_ai2:
         st.write("**AI Search Query Enhancement:**")
-        if st.button("🚀 Enhance Search Query"):
+        if st.button("Enhance Search Query"):
             if search_query:
-                with st.spinner("🤖 AI is enhancing your query..."):
+                with st.spinner("AI is enhancing your query..."):
                     # Create context for query enhancement
                     context = f"User wants to search for: {search_query}"
                     enhanced_query = llm_service.answer_educational_question(
                         "How can I improve this search query to get better results?",
                         context
                     )
-                    st.success("🚀 AI-Enhanced Search Suggestions:")
+                    st.success("AI-Enhanced Search Suggestions:")
                     st.write(enhanced_query)
             else:
                 st.warning("Please enter a search query first")
@@ -206,13 +206,13 @@ def content_search_page():
     
     # Search results
     if search_button and search_query:
-        st.subheader("📚 Search Results")
+        st.subheader("Search Results")
         
         # Get real search results
         results = get_real_search_results(search_query, subject_filter, difficulty_filter, content_type_filter)
         
         if results:
-            st.success(f"✅ Found {len(results)} relevant results")
+            st.success(f"Found {len(results)} relevant results")
             
             for i, result in enumerate(results, 1):
                 with st.expander(f"{i}. {result['title']} (Relevance: {result['relevance']:.2f})"):
@@ -229,16 +229,16 @@ def content_search_page():
                     
                     col_view, col_save = st.columns(2)
                     with col_view:
-                        if st.button("��️ View Full Content", key=f"view_{i}"):
-                            st.info("�� Full content would be displayed here")
+                        if st.button("View Full Content", key=f"view_{i}"):
+                            st.info("Full content would be displayed here")
                     with col_save:
-                        if st.button("💾 Save to Library", key=f"save_{i}"):
-                            st.success("✅ Content saved to your library!")
+                        if st.button("Save to Library", key=f"save_{i}"):
+                            st.success("Content saved to your library!")
         else:
-            st.warning("🔍 No results found. Try different keywords or filters.")
+            st.warning("No results found. Try different keywords or filters.")
     
     # Real search analytics
-    with st.expander("📊 Authentic Search Analytics"):
+    with st.expander("Authentic Search Analytics"):
         if analytics:
             st.write(f"**Total Content Available:** {analytics['total_content']} items")
             
@@ -270,7 +270,7 @@ def content_search_page():
     
     # Content recommendations based on real data
     if analytics:
-        st.subheader("💡 Content Recommendations")
+        st.subheader("Content Recommendations")
         
         col_rec1, col_rec2 = st.columns(2)
         
@@ -290,11 +290,11 @@ def content_search_page():
                 advanced = analytics['difficulties'].get('advanced', 0)
                 
                 if beginner > advanced:
-                    st.success("**Beginner-Friendly System**")
+                    st.success("Beginner-Friendly System")
                     st.write("• Plenty of beginner content")
                     st.write("• Good for new learners")
                 elif advanced > beginner:
-                    st.warning("**Advanced-Focused System**")
+                    st.warning("Advanced-Focused System")
                     st.write("• More advanced content available")
                     st.write("• Consider adding beginner materials")
 

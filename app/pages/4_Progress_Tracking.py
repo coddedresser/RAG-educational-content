@@ -116,7 +116,7 @@ def get_real_subject_performance():
 def progress_tracking_page():
     # Check authentication
     if 'session_token' not in st.session_state:
-        st.error("🔐 Please sign in to access this page")
+        st.error("Please sign in to access this page")
         st.stop()
     
     # Import auth component
@@ -131,10 +131,10 @@ def progress_tracking_page():
     
     if not user:
         del st.session_state.session_token
-        st.error("🔐 Session expired. Please sign in again")
+        st.error("Session expired. Please sign in again")
         st.stop()
     
-    st.title("📊 Progress Tracking & Analytics")
+    st.title("Progress Tracking & Analytics")
     st.write(f"Welcome, {user.get('full_name', user['username'])}! Monitor your learning progress and get insights into your study patterns using real project data.")
     
     # Get real data
@@ -161,7 +161,7 @@ def progress_tracking_page():
             st.metric("Total Sessions", total_sessions)
     
     # AI-Powered Progress Analysis
-    st.subheader("🤖 AI-Powered Progress Insights")
+    st.subheader("AI-Powered Progress Insights")
     
     # Initialize LLM service
     llm_service = FreeLLMService()
@@ -170,8 +170,8 @@ def progress_tracking_page():
     
     with col_ai1:
         st.write("**AI Progress Analysis:**")
-        if st.button("🧠 Analyze My Progress"):
-            with st.spinner("🤖 AI is analyzing your progress..."):
+        if st.button("Analyze My Progress"):
+            with st.spinner("AI is analyzing your progress..."):
                 # Create progress context for AI analysis
                 progress_context = f"""
                 Student Progress Summary:
@@ -187,13 +187,13 @@ def progress_tracking_page():
                     "What insights can you provide about this student's learning progress and what recommendations do you have?",
                     progress_context
                 )
-                st.success("🧠 AI Progress Analysis:")
+                st.success("AI Progress Analysis:")
                 st.write(ai_analysis)
     
     with col_ai2:
         st.write("**AI Study Optimization:**")
-        if st.button("🚀 Get Study Tips"):
-            with st.spinner("🤖 AI is generating optimization tips..."):
+        if st.button("Get Study Tips"):
+            with st.spinner("AI is generating optimization tips..."):
                 # Create study optimization context
                 optimization_context = f"""
                 Student needs study optimization for:
@@ -208,14 +208,14 @@ def progress_tracking_page():
                     "How can this student improve their study efficiency and performance?",
                     optimization_context
                 )
-                st.success("🚀 AI Study Optimization Tips:")
+                st.success("AI Study Optimization Tips:")
                 st.write(ai_tips)
     
     st.divider()
     
     # Real progress charts
     if weekly_progress is not None and not weekly_progress.empty:
-        st.subheader("📈 Weekly Progress Analysis")
+        st.subheader("Weekly Progress Analysis")
         
         col_chart1, col_chart2 = st.columns(2)
         
@@ -236,7 +236,7 @@ def progress_tracking_page():
     
     # Real subject performance
     if subject_performance:
-        st.subheader("🎯 Subject Performance Analysis")
+        st.subheader("Subject Performance Analysis")
         
         col_perf1, col_perf2 = st.columns(2)
         
@@ -272,7 +272,7 @@ def progress_tracking_page():
     
     # Detailed progress with real data
     if progress_data:
-        st.subheader("📋 Detailed Progress by Topic")
+        st.subheader("Detailed Progress by Topic")
         
         # Convert to DataFrame for better display
         progress_df = pd.DataFrame(progress_data)
@@ -292,7 +292,7 @@ def progress_tracking_page():
     
     # Real learning recommendations
     if progress_data and subject_performance:
-        st.subheader("💡 Data-Driven Learning Recommendations")
+        st.subheader("Data-Driven Learning Recommendations")
         
         col_rec1, col_rec2 = st.columns(2)
         
@@ -334,7 +334,7 @@ def progress_tracking_page():
     
     # Progress trends based on real data
     if progress_data:
-        st.subheader("📊 Progress Trends Analysis")
+        st.subheader("Progress Trends Analysis")
         
         # Create realistic trend data based on actual progress
         trend_data = []

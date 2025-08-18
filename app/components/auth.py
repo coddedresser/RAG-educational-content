@@ -272,7 +272,7 @@ class AuthUI:
     
     def show_auth_page(self):
         """Display authentication page with login/register options"""
-        st.title("🔐 User Authentication")
+        st.title("User Authentication")
         st.markdown("Sign in to access your personalized learning experience or create a new account.")
         
         # Clean up expired sessions
@@ -286,7 +286,7 @@ class AuthUI:
                 return
         
         # Authentication tabs
-        tab1, tab2 = st.tabs(["🔑 Sign In", "📝 Sign Up"])
+        tab1, tab2 = st.tabs(["Sign In", "Sign Up"])
         
         with tab1:
             self._show_login_form()
@@ -398,23 +398,23 @@ class AuthUI:
     
     def _show_user_dashboard(self, user: Dict[str, Any]):
         """Display user dashboard after login"""
-        st.success(f"Welcome back, {user.get('full_name', user['username'])}! 🎉")
+        st.success(f"Welcome back, {user.get('full_name', user['username'])}!")
         
         col1, col2, col3 = st.columns([2, 1, 1])
         
         with col1:
-            st.subheader("👤 Your Profile")
+            st.subheader("Your Profile")
             st.write(f"**Username:** {user['username']}")
             st.write(f"**Email:** {user['email']}")
             st.write(f"**Member since:** {user['created_at'][:10]}")
             
             if user.get('profile_completed'):
-                st.success("✅ Profile completed")
+                st.success("Profile completed")
             else:
-                st.warning("⚠️ Complete your profile for personalized learning")
+                st.warning("Complete your profile for personalized learning")
         
         with col2:
-            st.subheader("📊 Quick Stats")
+            st.subheader("Quick Stats")
             if user.get('progress'):
                 st.metric("Learning Sessions", len(user['progress']))
             else:
@@ -426,14 +426,14 @@ class AuthUI:
                 st.metric("Learning Style", "Not set")
         
         with col3:
-            st.subheader("⚙️ Account")
-            if st.button("🔒 Change Password"):
+            st.subheader("Account")
+            if st.button("Change Password"):
                 st.session_state.show_change_password = True
             
-            if st.button("🗑️ Delete Account"):
+            if st.button("Delete Account"):
                 st.session_state.show_delete_account = True
             
-            if st.button("🚪 Sign Out"):
+            if st.button("Sign Out"):
                 self._logout_user()
         
         # Change password form
@@ -447,24 +447,24 @@ class AuthUI:
         st.divider()
         
         # Quick actions
-        st.subheader("🚀 Quick Actions")
+        st.subheader("Quick Actions")
         col1, col2, col3 = st.columns(3)
         
         with col1:
-            if st.button("📚 Start Learning", type="primary", use_container_width=True):
+            if st.button("Start Learning", type="primary", use_container_width=True):
                 st.info("Navigate to Learning Path or Content Search to begin!")
         
         with col2:
-            if st.button("👤 Complete Profile", use_container_width=True):
+            if st.button("Complete Profile", use_container_width=True):
                 st.info("Go to Student Profile page to complete your learning profile!")
         
         with col3:
-            if st.button("📊 View Progress", use_container_width=True):
+            if st.button("View Progress", use_container_width=True):
                 st.info("Check your Progress Tracking page for detailed analytics!")
     
     def _show_change_password_form(self, user: Dict[str, Any]):
         """Display password change form"""
-        st.subheader("🔒 Change Password")
+        st.subheader("Change Password")
         
         with st.form("change_password_form"):
             current_password = st.text_input("Current Password", type="password")
@@ -499,8 +499,8 @@ class AuthUI:
     
     def _show_delete_account_form(self, user: Dict[str, Any]):
         """Display account deletion form"""
-        st.subheader("🗑️ Delete Account")
-        st.warning("⚠️ This action cannot be undone. All your data will be permanently deleted.")
+        st.subheader("Delete Account")
+        st.warning("This action cannot be undone. All your data will be permanently deleted.")
         
         with st.form("delete_account_form"):
             password = st.text_input("Enter your password to confirm", type="password")
@@ -538,13 +538,13 @@ class AuthUI:
     def require_auth(self):
         """Decorator to require authentication for pages"""
         if 'session_token' not in st.session_state:
-            st.error("🔐 Please sign in to access this page")
+            st.error("Please sign in to access this page")
             st.stop()
         
         user = self.auth.get_user_from_session(st.session_state.session_token)
         if not user:
             del st.session_state.session_token
-            st.error("🔐 Session expired. Please sign in again")
+            st.error("Session expired. Please sign in again")
             st.stop()
         
         return user

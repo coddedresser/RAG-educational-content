@@ -27,7 +27,7 @@ def main():
     # Page configuration
     st.set_page_config(
         page_title="Authentication - Educational RAG System",
-        page_icon="🔐",
+        page_icon=None,
         layout="wide",
         initial_sidebar_state="collapsed"
     )

@@ -80,7 +80,7 @@ def get_real_learning_insights():
 def student_profile_page():
     # Check authentication
     if 'session_token' not in st.session_state:
-        st.error("🔐 Please sign in to access this page")
+        st.error("Please sign in to access this page")
         st.stop()
     
     # Import auth component
@@ -95,10 +95,10 @@ def student_profile_page():
     
     if not user:
         del st.session_state.session_token
-        st.error("🔐 Session expired. Please sign in again")
+        st.error("Session expired. Please sign in again")
         st.stop()
     
-    st.title("👤 Student Profile Management")
+    st.title("Student Profile Management")
     st.write(f"Welcome, {user.get('full_name', user['username'])}! Manage your learning profile, preferences, and progress tracking using real project data.")
     
     # Get real data
@@ -109,7 +109,7 @@ def student_profile_page():
     col1, col2 = st.columns([2, 1])
     
     with col1:
-        st.subheader("📋 Personal Information")
+        st.subheader("Personal Information")
         
         # Profile form with real data
         with st.form("profile_form"):
@@ -120,7 +120,7 @@ def student_profile_page():
                                          ["High School", "Undergraduate", "Graduate", "Professional"],
                                          index=1 if student_data.get('education_level') == 'Undergraduate' else 0)
             
-            st.subheader("🎯 Learning Preferences")
+            st.subheader("Learning Preferences")
             
             # Get real subjects from actual content
             from config import SAMPLE_CONTENT
@@ -136,7 +136,7 @@ def student_profile_page():
                                     ["Morning", "Afternoon", "Evening", "Night"],
                                     index=1 if student_data.get('study_time') == 'Afternoon' else 0)
             
-            st.subheader("📚 Current Skills Assessment")
+            st.subheader("Current Skills Assessment")
             
             # Generate skill levels based on actual content
             skill_levels = {}
@@ -150,13 +150,13 @@ def student_profile_page():
                                                    ["beginner", "intermediate", "advanced"],
                                                    index=1 if level == 'intermediate' else 0)
             
-            submit_button = st.form_submit_button("💾 Update Profile")
+            submit_button = st.form_submit_button("Update Profile")
             
             if submit_button:
-                st.success("✅ Profile updated successfully!")
+                st.success("Profile updated successfully!")
     
     # AI-Powered Profile Analysis
-    st.subheader("🤖 AI-Powered Profile Analysis")
+    st.subheader("AI-Powered Profile Analysis")
     
     # Initialize LLM service
     llm_service = FreeLLMService()
@@ -165,8 +165,8 @@ def student_profile_page():
     
     with col_ai1:
         st.write("**AI Learning Style Assessment:**")
-        if st.button("🧠 Analyze Learning Style"):
-            with st.spinner("🤖 AI is analyzing your profile..."):
+        if st.button("Analyze Learning Style"):
+            with st.spinner("AI is analyzing your profile..."):
                 # Create student profile context for AI analysis
                 student_context = f"""
                 Student Profile:
@@ -179,20 +179,19 @@ def student_profile_page():
                 
                 # Analyze learning style with AI
                 ai_learning_style = llm_service.classify_learning_style([student_context])
-                st.success("🧠 AI Learning Style Analysis:")
+                st.success("AI Learning Style Analysis:")
                 st.write(f"**Current Selection**: {learning_style.title()}")
                 st.write(f"**AI Recommendation**: {ai_learning_style.title()}")
                 
                 if ai_learning_style.lower() != learning_style.lower():
-                    st.info("💡 AI suggests trying a different learning style for better results!")
-                    st.write("**AI Reasoning**: The AI analyzed your profile and found patterns that suggest a different learning approach might be more effective.")
+                    st.info("AI suggests trying a different learning style for better results!")
                 else:
-                    st.success("🎯 AI confirms your learning style choice is optimal!")
+                    st.success("AI confirms your learning style choice is optimal!")
     
     with col_ai2:
         st.write("**AI Study Recommendations:**")
-        if st.button("💡 Get AI Study Tips"):
-            with st.spinner("🤖 AI is generating personalized study tips..."):
+        if st.button("Get AI Study Tips"):
+            with st.spinner("AI is generating personalized study tips..."):
                 # Create context for study recommendations
                 study_context = f"""
                 Student needs study recommendations for:
@@ -206,13 +205,13 @@ def student_profile_page():
                     "What are the best study strategies for this student profile?",
                     study_context
                 )
-                st.success("💡 AI Study Recommendations:")
+                st.success("AI Study Recommendations:")
                 st.write(ai_recommendations)
     
     st.divider()
     
     with col2:
-        st.subheader(" Profile Summary")
+        st.subheader("Profile Summary")
         
         if learning_insights:
             # Real metrics based on actual content
@@ -223,7 +222,7 @@ def student_profile_page():
         
         # Learning style visualization based on real preferences
         if student_data.get('learning_style'):
-            st.subheader("🎨 Learning Style")
+            st.subheader("Learning Style")
             style_data = pd.DataFrame({
                 'Style': ['Visual', 'Auditory', 'Kinesthetic', 'Reading'],
                 'Preference': [85, 60, 45, 70]  # Based on learning_style preference
@@ -240,7 +239,7 @@ def student_profile_page():
             st.plotly_chart(fig, use_container_width=True)
     
     # Real learning history
-    st.subheader("�� Authentic Learning History")
+    st.subheader("Authentic Learning History")
     
     if student_data.get('learning_history'):
         # Convert to DataFrame for better display
@@ -265,7 +264,7 @@ def student_profile_page():
     
     # Real learning insights
     if learning_insights:
-        st.subheader("💡 Data-Driven Learning Insights")
+        st.subheader("Data-Driven Learning Insights")
         
         col_insight1, col_insight2 = st.columns(2)
         
@@ -292,7 +291,7 @@ def student_profile_page():
     
     # Subject proficiency chart
     if learning_insights.get('difficulty_distribution'):
-        st.subheader("📊 Subject Proficiency Analysis")
+        st.subheader("Subject Proficiency Analysis")
         
         difficulty_df = pd.DataFrame([
             {'Difficulty': k, 'Count': v} 
@@ -302,21 +301,6 @@ def student_profile_page():
         fig = px.pie(difficulty_df, values='Count', names='Difficulty', 
                     title="Content Distribution by Difficulty Level")
         st.plotly_chart(fig, use_container_width=True)
-        
-        # Recommendations based on difficulty distribution
-        col_rec1, col_rec2 = st.columns(2)
-        
-        with col_rec1:
-            if learning_insights['difficulty_distribution'].get('beginner', 0) < 3:
-                st.warning("**Beginner Content**: Consider adding more beginner-friendly materials")
-            else:
-                st.success("**Beginner Content**: Good variety of beginner materials available")
-        
-        with col_rec2:
-            if learning_insights['difficulty_distribution'].get('advanced', 0) < 2:
-                st.info("**Advanced Content**: Could benefit from more advanced materials")
-            else:
-                st.success("**Advanced Content**: Good progression to advanced topics")
 
 if __name__ == "__main__":
     student_profile_page()
