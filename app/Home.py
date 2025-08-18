@@ -514,8 +514,12 @@ def main():
 	
 	# Check authentication
 	if 'session_token' not in st.session_state:
-		st.warning("Please sign in to access the RAG system")
-		st.info("Navigate to the Authentication page to sign in or create an account")
+		# Render embedded authentication UI directly on main screen
+		try:
+			from components.auth import AuthUI
+		except ImportError:
+			from app.components.auth import AuthUI
+		AuthUI().show_auth_page()
 		st.stop()
 	
 	# Import auth component
@@ -529,8 +533,13 @@ def main():
 	user = auth.get_user_from_session(st.session_state.session_token)
 	
 	if not user:
+		# Session invalid/expired: show embedded authentication
 		del st.session_state.session_token
-		st.error("Session expired. Please sign in again")
+		try:
+			from components.auth import AuthUI
+		except ImportError:
+			from app.components.auth import AuthUI
+		AuthUI().show_auth_page()
 		st.stop()
 	
 	# Initialize RAG system in session state

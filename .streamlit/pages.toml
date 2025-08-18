@@ -1,0 +1,27 @@
+[[pages]]
+path = "app/main.py"
+name = "Home"
+
+[[pages]]
+path = "app/pages/0_Authentication.py"
+name = "User Settings"
+
+[[pages]]
+path = "app/pages/1_Learning_Path.py"
+name = "Learning Path"
+
+[[pages]]
+path = "app/pages/2_Content_search.py"
+name = "Content Search"
+
+[[pages]]
+path = "app/pages/3_Student_Profile.py"
+name = "Student Profile"
+
+[[pages]]
+path = "app/pages/4_Progress_Tracking.py"
+name = "Progress Tracking"
+
+[[pages]]
+path = "app/pages/5_System_analytics.py"
+name = "System Analytics"
