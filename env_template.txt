@@ -1,7 +1,0 @@
-# Groq API Configuration
-# Rename this file to .env and add your actual API key
-GROQ_API_KEY=your_actual_api_key_here
-
-# Other environment variables (optional)
-# DATABASE_URL=your_database_url
-# SECRET_KEY=your_secret_key
